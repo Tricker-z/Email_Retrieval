@@ -13,3 +13,16 @@ class Email(models.Model):
 
     def __str__(self):
         return self.MessageID
+
+
+class Index(models.Model):
+    '''Inverted Index'''
+    Term = models.CharField(max_length=30, primary_key=True)
+    Ndf = models.FloatField(default=0)
+    Posting = models.TextField()
+
+
+class FileLength(models.Model):
+    '''File vector length'''
+    ID = models.IntegerField(primary_key=True)
+    Length = models.FloatField(default=0)
