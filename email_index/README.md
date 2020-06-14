@@ -18,4 +18,4 @@ Source Data: emails.csv (1.32 Gb)
 
 1. Run [index_build.py](index_build.py) which generates the inverted index of the source data. SPIMI is used and chunk parts is saved in the chunk path
 
-2. Run [index_save.py](index_save.py) to merge the chunks and save the inverted index and file vector length to the database of the retrieval system
+2. Run [index_save.py](index_save.py) to merge the chunks and save the inverted index to the database of the retrieval system, the document vector length is saved to file.

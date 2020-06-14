@@ -6,14 +6,119 @@
     <title>IR System</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="static/css/style.css">
+    <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.js"></script>
+    <script src="static/js/index.js"></script>
+    <script src="//unpkg.com/vue/dist/vue.js"></script>
+    <script src="//unpkg.com/element-ui@2.0.11/lib/index.js"></script>
+    <style>
+        @import url("//unpkg.com/element-ui@2.0.11/lib/theme-chalk/index.css");
+
+        .fade-enter-active {
+            transition: opacity 1s;
+        }
+
+        .fade-enter,
+        .fade-leave-to {
+            opacity: 0.25;
+        }
+
+        .el-textarea__inner {
+            font-family: "Microsoft";
+            font-size: 15px;
+        }
+    </style>
 </head>
 
 <body>
-    <div class="search-box">
-        <input type="text" placeholder="Email Retrieval" /><span></span>
+
+    <div>
+        <div style=" margin-bottom:30px;">
+            <img src="static/enron.png" style="vertical-align:middle">
+            <div class="search-box" style="margin-left:30px; vertical-align: bottom;">
+                <input type="text" id="query" placeholder="Email Retrieval" /><span></span>
+            </div>
+        </div>
+
+
+        <div id="app">
+            <transition name="fade">
+                <template>
+                    <el-table :data="tableData" @row-click="showPayload" :row-class-name="tableRowClass" height="350"
+                        border style="width: 100%" v-if="!show">
+                        <el-table-column prop="messageId" label="Message id" width="200">
+                        </el-table-column>
+                        <el-table-column prop="date" label="Date" width="180">
+                        </el-table-column>
+                        <el-table-column prop="from" label="From" width="220">
+                        </el-table-column>
+                        <el-table-column prop="to" label="To" width="220">
+                        </el-table-column>
+                        <el-table-column prop="subject" label="Subject" width="220">
+                        </el-table-column>
+                    </el-table>
+                </template>
+
+                <el-input type="textarea" :rows="15" placeholder="Email Payload" style="width: 1000px"
+                    v-model="textarea" v-if="show">
+                </el-input>
+            </transition>
+        </div>
     </div>
 
-    <script src="static/js/index.js"></script>
+    <script>
+        var Main = new Vue({
+            el: "#app",
+            data: {
+                tableData: new Array(),
+                payload: new Array(),
+                textarea: '',
+                show: false
+            },
+            methods: {
+                tableRowClass({ row, rowIndex }) {
+                    row.index = rowIndex;
+                    return 'row-remarks';
+                },
+                showPayload(row) {
+                    Main.$data.show = !Main.$data.show;
+                    Main.$data.textarea = Main.$data.payload[row.index];
+                }
+            },
+        });
+
+        $(document).ready(function () {
+            $(document).keyup(function (event) {
+                if (event.keyCode == 27) {
+                    // press esc to close payload
+                    if (Main.$data.show) {
+                        Main.$data.show = !Main.$data.show;
+                    }
+                }
+                else if (event.keyCode == 13) {
+                    // press enter to search
+                    var query = $("#query").val();
+                    if (query != "") {
+                        Main.$data.tableData = new Array();
+                        Main.$data.payload = new Array();
+                        $.post("{% url 'email_app:retrieval' %}", { query: query }, function (data) {
+                            for (var i = 0; i < data.length; i++) {
+                                email = data[i]['fields'];
+                                Main.$set(Main.$data.payload, i, email['Payload']);
+                                Main.$set(Main.$data.tableData, i, {
+                                    messageId: email['MessageID'],
+                                    date: email['Date'],
+                                    from: email['UserFrom'],
+                                    to: email['UserTo'],
+                                    subject: email['Subject']
+                                });
+                            }
+                        });
+                    }
+                }
+            });
+        });
+    </script>
+
 </body>
 
 </html>
