@@ -3,3 +3,4 @@
 /email_index/index_chunks
 /email_index/doc_length.txt
 /email_IR/db.sqlite3
+*.pyc
