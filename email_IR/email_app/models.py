@@ -20,9 +20,3 @@ class Index(models.Model):
     Term = models.CharField(max_length=30, primary_key=True)
     Ndf = models.FloatField(default=0)
     Posting = models.TextField()
-
-
-class FileLength(models.Model):
-    '''File vector length'''
-    ID = models.IntegerField(primary_key=True)
-    Length = models.FloatField(default=0)

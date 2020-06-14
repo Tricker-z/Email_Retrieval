@@ -1,4 +1,5 @@
 /email_index/emails_data
 /email_index/emails.csv
 /email_index/index_chunks
+/email_index/doc_length.txt
 /email_IR/db.sqlite3

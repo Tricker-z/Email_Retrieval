@@ -11,7 +11,6 @@ c = conn.cursor()
 
 def sava_emails(file_path):
     '''save data to database'''
-
     email_id = 0
     sql = '''insert into email_app_email(id, messageid, date, userfrom, userto, subject, payload) 
             values (?,?,?,?,?,?,?);'''

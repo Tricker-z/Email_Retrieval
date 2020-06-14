@@ -4,9 +4,10 @@ import sqlite3
 
 chunk_path = "index_chunks"
 db_path = "../email_IR/db.sqlite3"
+doc_num = 517401
 
 inverted_index = dict()
-doc_len = dict()
+doc_len = [0 for i in range(doc_num)]
 
 file_count = 0
 for root, dirs, files in os.walk(chunk_path, True):
@@ -24,7 +25,6 @@ for root, dirs, files in os.walk(chunk_path, True):
             inverted_index[term][1] = inverted_index[term][1] + doc_list
         f.close()
 
-    doc_num = 517401
     for term in inverted_index:
         inverted_index[term][1] = sorted(
             inverted_index[term][1], key=lambda x: (x[0]))
@@ -35,31 +35,26 @@ for root, dirs, files in os.walk(chunk_path, True):
         idf = log(inverted_index[term][0], 10)
         for doc, tf in inverted_index[term][1]:
             wf = 1+log(tf, 10)
-            if doc not in doc_len:
-                doc_len[doc] = 0
-            doc_len[doc] += pow(wf*idf, 2)
+            doc_len[doc-1] += pow(wf*idf, 2)
+    for i in range(doc_num):
+        doc_len[i] = doc_len[i]**0.5
 
 
-# save index and doc_len to database
+# save index to database
 conn = sqlite3.connect(db_path)
 c = conn.cursor()
 
 term_count = 0
-sql_index = "insert into email_app_index(term, ndf, posting) VALUES (?,?,?);"
+sql_index = '''insert into email_app_index(term, ndf, posting) VALUES (?,?,?);'''
 for term in inverted_index:
     term_count += 1
-    print("term", term_count)
+    print("Term", term_count)
     para = (term, inverted_index[term][0], str(inverted_index[term][1]))
     c.execute(sql_index, para)
 conn.commit()
-
-doc_count = 0
-sql_len = "insert into email_app_filelength(id, length) values (?,?);"
-for doc in doc_len:
-    doc_count += 1
-    print("doc", doc_count)
-    para = (doc, doc_len[doc]**0.5)
-    c.execute(sql_len, para)
-conn.commit()
-
 conn.close()
+
+# write document length to file
+output = open('doc_length.txt', 'a+')
+output.write(str(doc_len))
+output.close()
