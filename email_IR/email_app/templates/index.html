@@ -44,7 +44,7 @@
             <transition name="fade">
                 <template>
                     <el-table :data="tableData" @row-click="showPayload" :row-class-name="tableRowClass" height="350"
-                        border style="width: 100%" v-if="!show">
+                        border style="width: 100%" v-loading="loading" v-if="!show">
                         <el-table-column prop="messageId" label="Message id" width="200">
                         </el-table-column>
                         <el-table-column prop="date" label="Date" width="180">
@@ -72,7 +72,8 @@
                 tableData: new Array(),
                 payload: new Array(),
                 textarea: '',
-                show: false
+                show: false,
+                loading: false
             },
             methods: {
                 tableRowClass({ row, rowIndex }) {
@@ -100,7 +101,9 @@
                     if (query != "") {
                         Main.$data.tableData = new Array();
                         Main.$data.payload = new Array();
+                        Main.$data.loading = true;
                         $.post("{% url 'email_app:retrieval' %}", { query: query }, function (data) {
+                            Main.$data.loading = false;
                             for (var i = 0; i < data.length; i++) {
                                 email = data[i]['fields'];
                                 Main.$set(Main.$data.payload, i, email['Payload']);
@@ -113,6 +116,7 @@
                                 });
                             }
                         });
+                        
                     }
                 }
             });

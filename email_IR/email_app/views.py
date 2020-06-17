@@ -35,10 +35,14 @@ def email_query(query_list):
     query = list()
     for q in query_list.split():
         q = q.lower()
-        grams_model = [q[i:i+3] for i in range(len(q)-2)]
+        if len(q) < 3:
+            query.append(q)
+            continue
 
         max_val = 0
         result = list()
+        grams_model = [q[i:i+3] for i in range(len(q)-2)]
+
         for gram in grams_model:
             if gram in three_gram_index:
                 for term in three_gram_index[gram]:
@@ -50,6 +54,7 @@ def email_query(query_list):
                     elif val == max_val and term not in result:
                         result.append(term)
         query.extend(result)
+    print(query)
     return doc_query(query)
 
 
