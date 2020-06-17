@@ -55,6 +55,20 @@ conn.commit()
 conn.close()
 
 # write document length to file
-output = open('doc_length.txt', 'a+')
+output = open('static/doc_length.txt', 'a+')
 output.write(str(doc_len))
 output.close()
+
+# generate 3-gram index
+three_gram_index = dict()
+
+for term in inverted_index:
+    for i in range(len(term)-2):
+        gram = term[i:i+3]
+        if gram not in three_gram_index:
+            three_gram_index[gram] = []
+        three_gram_index[gram].append(term)
+
+gram_write = open('static/three_gram_index.txt', 'a+')
+gram_write.write(str(three_gram_index))
+gram_write.close()

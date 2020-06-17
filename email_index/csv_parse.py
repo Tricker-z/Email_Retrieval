@@ -1,7 +1,7 @@
 import os
 import csv
 
-file_path = 'emails.csv' # path of downloaded csv file
+file_path = 'static/emails.csv' # path of downloaded csv file
 
 r = csv.reader(open(file_path, 'r', errors='ignore'))
 csv.field_size_limit(1000000000)
